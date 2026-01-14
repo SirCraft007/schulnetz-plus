@@ -178,9 +178,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       });
     return true; // Keep channel open for async response
   } else if (request.action === "checkPage") {
-    const hasGrades = document.querySelector(".div_noten") !== null;
-    console.log("[Content] checkPage result:", hasGrades);
-    sendResponse({ hasGrades });
+    const exists = document.querySelector(".div_noten") !== null;
+    console.log("[Content] checkPage result:", exists);
+    sendResponse({ exists });
   }
   return false;
 });
