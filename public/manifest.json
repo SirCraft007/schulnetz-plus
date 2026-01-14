@@ -4,6 +4,8 @@
   "description": "Verbesserungen für Schulnetz",
   "version": "1.0",
 
+  "permissions": ["activeTab", "tabs"],
+
   "content_scripts": [
     {
       "js": ["content.js"],

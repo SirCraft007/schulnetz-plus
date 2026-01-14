@@ -135,10 +135,22 @@ async function copyGradesToClipboard() {
   }
 }
 
-// Usage:
-// In browser console:
-// downloadGradesJSON(); // Downloads as JSON file
-// copyGradesToClipboard(); // Copies to clipboard
+// Listen for messages from popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "downloadGrades") {
+    downloadGradesJSON();
+    sendResponse({ success: true });
+  } else if (request.action === "copyGrades") {
+    copyGradesToClipboard().then((success) => {
+      sendResponse({ success });
+    });
+    return true; // Keep channel open for async response
+  } else if (request.action === "checkPage") {
+    const hasGrades = document.querySelector(".div_noten") !== null;
+    sendResponse({ hasGrades });
+  }
+  return false;
+});
 
-const grades = extractGrades(); // Gets data object
+const grades = extractGrades();
 console.log(grades);
