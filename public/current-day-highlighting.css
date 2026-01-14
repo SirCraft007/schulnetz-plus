@@ -1,0 +1,8 @@
+.dhx_scale_holder_now {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAGUlEQVQI12P4/3khA7Xx6wdTGGhh7rkjTQDvE3CSHFaX7QAAAABJRU5ErkJggg==) !important;
+}
+
+.dhx_now .dhx_month_body,
+.dhx_now .dhx_month_head {
+  background-color: #fff3a1 !important;
+}
