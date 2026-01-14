@@ -101,8 +101,13 @@ function extractGrades() {
  * Downloads the extracted data as JSON file
  */
 function downloadGradesJSON() {
+  console.log("[Content] downloadGradesJSON called");
   const data = extractGrades();
-  if (!data) return;
+  console.log("[Content] Extracted data:", data);
+  if (!data) {
+    console.error("[Content] No data extracted, grades div not found");
+    return;
+  }
 
   const jsonStr = JSON.stringify(data, null, 2);
   const blob = new Blob([jsonStr], { type: "application/json" });
@@ -121,8 +126,13 @@ function downloadGradesJSON() {
  * Copies the extracted data to clipboard
  */
 async function copyGradesToClipboard() {
+  console.log("[Content] copyGradesToClipboard called");
   const data = extractGrades();
-  if (!data) return;
+  console.log("[Content] Extracted data:", data);
+  if (!data) {
+    console.error("[Content] No data extracted, grades div not found");
+    return false;
+  }
 
   const jsonStr = JSON.stringify(data, null, 2);
   try {
@@ -137,16 +147,39 @@ async function copyGradesToClipboard() {
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log("[Content] Received message:", request);
+
   if (request.action === "downloadGrades") {
-    downloadGradesJSON();
-    sendResponse({ success: true });
+    console.log("[Content] Executing downloadGrades");
+    try {
+      downloadGradesJSON();
+      console.log("[Content] downloadGrades completed");
+      sendResponse({ success: true });
+    } catch (error) {
+      console.error("[Content] Error in downloadGrades:", error);
+      sendResponse({
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   } else if (request.action === "copyGrades") {
-    copyGradesToClipboard().then((success) => {
-      sendResponse({ success });
-    });
+    console.log("[Content] Executing copyGrades");
+    copyGradesToClipboard()
+      .then((success) => {
+        console.log("[Content] copyGrades completed, success:", success);
+        sendResponse({ success });
+      })
+      .catch((error) => {
+        console.error("[Content] Error in copyGrades:", error);
+        sendResponse({
+          success: false,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      });
     return true; // Keep channel open for async response
   } else if (request.action === "checkPage") {
     const hasGrades = document.querySelector(".div_noten") !== null;
+    console.log("[Content] checkPage result:", hasGrades);
     sendResponse({ hasGrades });
   }
   return false;
