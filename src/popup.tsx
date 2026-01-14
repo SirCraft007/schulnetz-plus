@@ -21,8 +21,7 @@ function Popup() {
 
       if (!tab?.id) {
         console.error("[Popup] No tab ID found");
-        setMessage("Kein Tab gefunden");
-        setTimeout(() => setMessage(""), 2000);
+        setPageStatus("invalid");
         return;
       }
 
@@ -37,7 +36,8 @@ function Popup() {
         setPageStatus("invalid");
       }
     } catch (error) {
-      console.error("[Popup] Error in checkCurrentPage:", error);
+      // Content script not loaded on this page - this is expected for non-schulnetz pages
+      console.log("[Popup] Content script not available on this page");
       setPageStatus("invalid");
     }
   };
@@ -72,11 +72,8 @@ function Popup() {
       setMessage("Download gestartet!");
       setTimeout(() => setMessage(""), 2000);
     } catch (error) {
-      console.error("[Popup] Error in handleDownload:", error);
-      setMessage(
-        "Fehler beim Download: " +
-          (error instanceof Error ? error.message : String(error))
-      );
+      console.log("[Popup] Error in handleDownload:", error);
+      setMessage("Fehler beim Download");
       setTimeout(() => setMessage(""), 2000);
     }
   };
@@ -113,11 +110,8 @@ function Popup() {
       }
       setTimeout(() => setMessage(""), 2000);
     } catch (error) {
-      console.error("[Popup] Error in handleCopy:", error);
-      setMessage(
-        "Fehler beim Kopieren: " +
-          (error instanceof Error ? error.message : String(error))
-      );
+      console.log("[Popup] Error in handleCopy:", error);
+      setMessage("Fehler beim Kopieren");
       setTimeout(() => setMessage(""), 2000);
     }
   };
