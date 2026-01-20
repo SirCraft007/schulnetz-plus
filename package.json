@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "watch": "vite build --watch & vite build --watch --mode popup",
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && vite build --mode popup && cp -r public/* dist/",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

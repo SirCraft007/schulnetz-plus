@@ -50,3 +50,6 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+
+noten-div.html
+grades*.json

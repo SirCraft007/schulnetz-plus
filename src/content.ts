@@ -1,3 +1,5 @@
+import { initRoot } from "./init";
+
 /**
  * Extracts grade data from the grades table
  */
@@ -40,7 +42,7 @@ function extractGrades() {
       row.querySelector("td b")
   );
 
-  rows.forEach((row, index) => {
+  rows.forEach((row) => {
     const cells = row.querySelectorAll("td");
     if (cells.length < 2) return;
 
@@ -62,18 +64,28 @@ function extractGrades() {
       }>,
     };
 
-    // Find the detail row for this course - escape the class name
-    const detailRow = table?.querySelector(`tr[class*="0_${index}_detailrow"]`);
+    // Extract the actual index from the onclick attribute of the detail button
+    const detailButton = cells[2]?.querySelector("button[onclick*='toggle_notendetails']");
+    const onclickAttr = detailButton?.getAttribute("onclick");
+    const indexMatch = onclickAttr?.match(/toggle_notendetails\(0,\s*(\d+)\)/);
+    const actualIndex = indexMatch ? indexMatch[1] : null;
+
+    // Find the detail row for this course using the actual index from HTML
+    const detailRow = actualIndex ? table?.querySelector(`tr[class*="0_${actualIndex}_detailrow"]`) : null;
     if (detailRow) {
       const detailTable = detailRow.querySelector("table.clean");
       if (detailTable) {
         const assessmentRows = Array.from(
           detailTable.querySelectorAll("tr")
         ).filter((tr) => {
-          const dateTd = tr.querySelector("td.td_einzelpruefungen");
-          return (
-            dateTd && dateTd.textContent.trim().match(/\d{2}\.\d{2}\.\d{4}/)
-          );
+          const cells = tr.querySelectorAll("td");
+          // Skip header rows and group header rows
+          if (cells.length < 5) return false;
+          if (tr.className.includes("pruefungsgruppe")) return false;
+          
+          // Check if second column (index 1) contains a date
+          const dateCell = cells[1];
+          return dateCell && dateCell.textContent.trim().match(/\d{2}\.\d{2}\.\d{4}/);
         });
 
         assessmentRows.forEach((aRow) => {
@@ -101,9 +113,7 @@ function extractGrades() {
  * Downloads the extracted data as JSON file
  */
 function downloadGradesJSON() {
-  console.log("[Content] downloadGradesJSON called");
   const data = extractGrades();
-  console.log("[Content] Extracted data:", data);
   if (!data) {
     console.error("[Content] No data extracted, grades div not found");
     return;
@@ -126,18 +136,14 @@ function downloadGradesJSON() {
  * Copies the extracted data to clipboard
  */
 async function copyGradesToClipboard() {
-  console.log("[Content] copyGradesToClipboard called");
   const data = extractGrades();
-  console.log("[Content] Extracted data:", data);
   if (!data) {
-    console.error("[Content] No data extracted, grades div not found");
     return false;
   }
 
   const jsonStr = JSON.stringify(data, null, 2);
   try {
     await navigator.clipboard.writeText(jsonStr);
-    console.log("Grades copied to clipboard!");
     return true;
   } catch (err) {
     console.error("Failed to copy:", err);
@@ -147,26 +153,19 @@ async function copyGradesToClipboard() {
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log("[Content] Received message:", request);
-
   if (request.action === "downloadGrades") {
-    console.log("[Content] Executing downloadGrades");
     try {
       downloadGradesJSON();
-      console.log("[Content] downloadGrades completed");
       sendResponse({ success: true });
     } catch (error) {
-      console.error("[Content] Error in downloadGrades:", error);
       sendResponse({
         success: false,
         error: error instanceof Error ? error.message : String(error),
       });
     }
   } else if (request.action === "copyGrades") {
-    console.log("[Content] Executing copyGrades");
     copyGradesToClipboard()
       .then((success) => {
-        console.log("[Content] copyGrades completed, success:", success);
         sendResponse({ success });
       })
       .catch((error) => {
@@ -179,11 +178,31 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Keep channel open for async response
   } else if (request.action === "checkPage") {
     const exists = document.querySelector(".div_noten") !== null;
-    console.log("[Content] checkPage result:", exists);
     sendResponse({ exists });
   }
   return false;
 });
 
 const grades = extractGrades();
-console.log(grades);
+if (grades) {
+  console.log("[Content] Grades extracted:");
+}
+// Inject statistics
+// Source - https://stackoverflow.com/a
+// Posted by hahahumble
+// Retrieved 2026-01-14, License - CC BY-SA 4.0
+
+const body = document.querySelector("body");
+const app = document.createElement("div");
+
+app.id = "react-root";
+
+if (body) {
+  body.prepend(app);
+}
+
+const gradesDiv = document.querySelector(".div_noten");
+console.log("[Content] gradesDiv:", gradesDiv);
+if (gradesDiv) {
+  initRoot(gradesDiv);
+}
