@@ -39,7 +39,7 @@ function extractGrades() {
     (row) =>
       !row.className.includes("detailrow") &&
       !row.id.includes("verlauf") &&
-      row.querySelector("td b")
+      row.querySelector("td b"),
   );
 
   rows.forEach((row) => {
@@ -65,27 +65,33 @@ function extractGrades() {
     };
 
     // Extract the actual index from the onclick attribute of the detail button
-    const detailButton = cells[2]?.querySelector("button[onclick*='toggle_notendetails']");
+    const detailButton = cells[2]?.querySelector(
+      "button[onclick*='toggle_notendetails']",
+    );
     const onclickAttr = detailButton?.getAttribute("onclick");
     const indexMatch = onclickAttr?.match(/toggle_notendetails\(0,\s*(\d+)\)/);
     const actualIndex = indexMatch ? indexMatch[1] : null;
 
     // Find the detail row for this course using the actual index from HTML
-    const detailRow = actualIndex ? table?.querySelector(`tr[class*="0_${actualIndex}_detailrow"]`) : null;
+    const detailRow = actualIndex
+      ? table?.querySelector(`tr[class*="0_${actualIndex}_detailrow"]`)
+      : null;
     if (detailRow) {
       const detailTable = detailRow.querySelector("table.clean");
       if (detailTable) {
         const assessmentRows = Array.from(
-          detailTable.querySelectorAll("tr")
+          detailTable.querySelectorAll("tr"),
         ).filter((tr) => {
           const cells = tr.querySelectorAll("td");
           // Skip header rows and group header rows
           if (cells.length < 5) return false;
           if (tr.className.includes("pruefungsgruppe")) return false;
-          
+
           // Check if second column (index 1) contains a date
           const dateCell = cells[1];
-          return dateCell && dateCell.textContent.trim().match(/\d{2}\.\d{2}\.\d{4}/);
+          return (
+            dateCell && dateCell.textContent.trim().match(/\d{2}\.\d{2}\.\d{4}/)
+          );
         });
 
         assessmentRows.forEach((aRow) => {
@@ -112,7 +118,7 @@ function extractGrades() {
 /**
  * Downloads the extracted data as JSON file
  */
-function downloadGradesJSON() {
+export function downloadGradesJSON() {
   const data = extractGrades();
   if (!data) {
     console.error("[Content] No data extracted, grades div not found");
@@ -135,7 +141,7 @@ function downloadGradesJSON() {
 /**
  * Copies the extracted data to clipboard
  */
-async function copyGradesToClipboard() {
+export async function copyGradesToClipboard() {
   const data = extractGrades();
   if (!data) {
     return false;
@@ -182,27 +188,31 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   return false;
 });
-
-const grades = extractGrades();
-if (grades) {
-  console.log("[Content] Grades extracted:");
-}
 // Inject statistics
 // Source - https://stackoverflow.com/a
 // Posted by hahahumble
 // Retrieved 2026-01-14, License - CC BY-SA 4.0
 
-const body = document.querySelector("body");
-const app = document.createElement("div");
+const url = window.location.href;
+const searchParams = new URL(url).searchParams;
 
-app.id = "react-root";
-
-if (body) {
-  body.prepend(app);
+const calButton = document.getElementById("menu21200");
+const calButtonHref = calButton?.getAttribute("href");
+if (calButtonHref) {
+  if (!url.includes("pageid=22202")) {
+    calButton?.setAttribute("href", calButtonHref.replace("21200", "22202"));
+  }
 }
 
-const gradesDiv = document.querySelector(".div_noten");
-console.log("[Content] gradesDiv:", gradesDiv);
-if (gradesDiv) {
-  initRoot(gradesDiv);
+if (searchParams.get("pageid") === "21311") {
+  const body = document.querySelector("body");
+  const app = document.createElement("div");
+  app.id = "react-root";
+  body?.prepend(app);
+
+  const gradesDiv = document.querySelector(".div_noten");
+  console.log("[Content] gradesDiv:", gradesDiv);
+  if (gradesDiv) {
+    initRoot(gradesDiv);
+  }
 }

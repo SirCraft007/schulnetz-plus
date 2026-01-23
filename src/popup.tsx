@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { EXTRACTOR_VERSION } from "./version";
 import "./popup.css";
 
 type PageStatus = "loading" | "valid" | "invalid";
@@ -173,6 +174,10 @@ function Popup() {
           {message}
         </div>
       )}
+
+      <div className="mt-4 text-xs text-center text-gray-500">
+        Version {EXTRACTOR_VERSION}
+      </div>
     </div>
   );
 }
