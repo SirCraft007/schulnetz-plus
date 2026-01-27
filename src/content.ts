@@ -1,5 +1,8 @@
 import { initRoot } from "./init";
 
+console.log("[Content] ========== SCHULNETZ+ EXTENSION LOADED ==========");
+console.log("[Content] Script version: 2.0");
+
 /**
  * Extracts grade data from the grades table
  */
@@ -188,31 +191,60 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   return false;
 });
-// Inject statistics
-// Source - https://stackoverflow.com/a
-// Posted by hahahumble
-// Retrieved 2026-01-14, License - CC BY-SA 4.0
 
 const url = window.location.href;
 const searchParams = new URL(url).searchParams;
+const pageId = searchParams.get("pageid");
+const replaceUrls: Record<string, string> = {
+  "21200": "22202",
+  "24030": "10003",
+  "22300": "22313",
+  "21355": "21374",
+};
 
-const calButton = document.getElementById("menu21200");
-const calButtonHref = calButton?.getAttribute("href");
-if (calButtonHref) {
-  if (!url.includes("pageid=22202")) {
-    calButton?.setAttribute("href", calButtonHref.replace("21200", "22202"));
+for (const [oldId, newId] of Object.entries(replaceUrls)) {
+  const calButton = document.getElementById(`menu${oldId}`);
+  const calButtonHref = calButton?.getAttribute("href");
+  if (!calButton || !calButtonHref) continue;
+
+  if (pageId === newId) {
+    console.log(
+      `[Content] On pageid=${newId}, setting menu${oldId} to original ${oldId}`,
+    );
+    const updatedHref = calButtonHref.includes(`pageid=${newId}`)
+      ? calButtonHref.replace(`pageid=${newId}`, `pageid=${oldId}`)
+      : calButtonHref.replace(newId, oldId);
+    calButton.setAttribute("href", updatedHref);
+  } else {
+    console.log(
+      `[Content] Not on pageid=${newId}, redirecting menu${oldId} to ${newId}`,
+    );
+    const updatedHref = calButtonHref.includes(`pageid=${oldId}`)
+      ? calButtonHref.replace(`pageid=${oldId}`, `pageid=${newId}`)
+      : calButtonHref.replace(oldId, newId);
+    calButton.setAttribute("href", updatedHref);
   }
 }
 
-if (searchParams.get("pageid") === "21311") {
-  const body = document.querySelector("body");
-  const app = document.createElement("div");
-  app.id = "react-root";
-  body?.prepend(app);
 
-  const gradesDiv = document.querySelector(".div_noten");
-  console.log("[Content] gradesDiv:", gradesDiv);
-  if (gradesDiv) {
-    initRoot(gradesDiv);
+if (searchParams.get("pageid") === "21311") {
+  console.log("[Content] On grades page, looking for .div_noten");
+
+  // Wait for DOM to be ready
+  const initApp = () => {
+    const gradesDiv = document.querySelector(".div_noten");
+
+    if (gradesDiv) {
+      initRoot(gradesDiv);
+    } else {
+      console.error("[Content] .div_noten not found on page");
+    }
+  };
+
+  // Try immediately and also after DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initApp);
+  } else {
+    initApp();
   }
 }

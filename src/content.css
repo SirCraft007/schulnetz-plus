@@ -1,0 +1,58 @@
+/* 
+  Tailwind v4 with proper scoping strategy:
+  We'll import Tailwind and then manually scope the base resets
+*/
+
+/* Import theme first */
+@import "tailwindcss/theme" layer(theme);
+
+/* Skip base layer entirely - we'll handle resets ourselves */
+
+/* Import utilities */
+@import "tailwindcss/utilities" layer(utilities);
+
+/* Manual base styles ONLY for our container */
+#grade-stats-root {
+  all: initial;
+  display: block;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+}
+
+#grade-stats-root *,
+#grade-stats-root *::before,
+#grade-stats-root *::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  margin: 0;
+  padding: 0;
+}
+
+#grade-stats-root img,
+#grade-stats-root svg,
+#grade-stats-root video,
+#grade-stats-root canvas {
+  display: block;
+  vertical-align: middle;
+  max-width: 100%;
+  height: auto;
+}
+
+#grade-stats-root button,
+#grade-stats-root input,
+#grade-stats-root select,
+#grade-stats-root textarea {
+  font: inherit;
+  color: inherit;
+}
+
+

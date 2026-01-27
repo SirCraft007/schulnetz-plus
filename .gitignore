@@ -52,4 +52,5 @@ lerna-debug.log*
 .pnpm-debug.log*
 
 noten-div.html
+*page.html
 grades*.json

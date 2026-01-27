@@ -9,10 +9,7 @@
   "content_scripts": [
     {
       "js": ["content.js"],
-      "matches": ["https://www.schulnetz-ag.ch/ksba*"]
-    },
-    {
-      "css": ["current-day-highlighting.css"],
+      "css": ["content.css", "current-day-highlighting.css"],
       "matches": ["https://www.schulnetz-ag.ch/ksba*"]
     }
   ],

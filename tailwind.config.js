@@ -1,6 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./public/*.html", "./src/**/*.{js,jsx,ts,tsx}"],
+  content: ["./public/*.html", "./src/**/*.{js,jsx,ts,tsx,css}"],
+  corePlugins: {
+    preflight: false,
+  },
+  // Use important to ensure our styles take precedence
+  important: '#grade-stats-root',
   theme: {
     extend: {
       colors: {
