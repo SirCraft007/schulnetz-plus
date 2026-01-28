@@ -200,6 +200,7 @@ const replaceUrls: Record<string, string> = {
   "24030": "10003",
   "22300": "22313",
   "21355": "21374",
+  "23118": "23102",
 };
 
 for (const [oldId, newId] of Object.entries(replaceUrls)) {
