@@ -54,3 +54,4 @@ lerna-debug.log*
 noten-div.html
 *page.html
 grades*.json
+*.csv

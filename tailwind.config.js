@@ -1,11 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./public/*.html", "./src/**/*.{js,jsx,ts,tsx,css}"],
-  corePlugins: {
-    preflight: false,
-  },
-  // Use important to ensure our styles take precedence
-  important: '#grade-stats-root',
+  // Shadow DOM provides isolation - no need to disable preflight or use important!
   theme: {
     extend: {
       colors: {

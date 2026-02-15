@@ -8,6 +8,7 @@ type PageStatus = "loading" | "valid" | "invalid";
 function Popup() {
   const [message, setMessage] = useState<string>("");
   const [pageStatus, setPageStatus] = useState<PageStatus>("loading");
+  const [enhanced, setEnhanced] = useState(false);
 
   const checkCurrentPage = async () => {
     console.log("[Popup] checkCurrentPage called");
@@ -45,6 +46,25 @@ function Popup() {
 
   useEffect(() => {
     checkCurrentPage();
+  }, []);
+
+  // Sync enhanced state from page on popup open
+  useEffect(() => {
+    (async () => {
+      try {
+        const [tab] = await chrome.tabs.query({
+          active: true,
+          currentWindow: true,
+        });
+        if (!tab?.id) return;
+        const res = await chrome.tabs.sendMessage(tab.id, {
+          action: "getEnhanced",
+        });
+        if (res) setEnhanced(!!res.enabled);
+      } catch {
+        /* ignore - content script not available */
+      }
+    })();
   }, []);
 
   const handleDownload = async () => {
@@ -143,6 +163,25 @@ function Popup() {
     );
   }
 
+  const handleToggleEnhanced = async () => {
+    try {
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+      if (!tab?.id) return;
+      const newState = !enhanced;
+      await chrome.tabs.sendMessage(tab.id, {
+        action: "toggleEnhanced",
+        enabled: newState,
+      });
+      setEnhanced(newState);
+    } catch {
+      setMessage("Fehler");
+      setTimeout(() => setMessage(""), 2000);
+    }
+  };
+
   return (
     <div className="p-4 text-white bg-gray-900 w-72">
       <div className="mb-4 text-center">
@@ -167,6 +206,22 @@ function Popup() {
           <span>📋</span>
           In Zwischenablage kopieren
         </button>
+
+        <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
+          <span className="text-sm font-medium">✨ Schönere Ansicht</span>
+          <button
+            onClick={handleToggleEnhanced}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              enhanced ? "bg-indigo-600" : "bg-gray-600"
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                enhanced ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       {message && (
