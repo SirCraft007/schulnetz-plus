@@ -1,8 +1,5 @@
 import "./content.css";
 
-console.log("[Content] ========== SCHULNETZ+ EXTENSION LOADED ==========");
-console.log("[Content] Script version: 3.1 (inline stats)");
-
 // ─── Types ──────────────────────────────────────────────────────────
 
 interface Assessment {
@@ -371,7 +368,6 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     const result = await chrome.storage.local.get("enhancedMode");
     if (result.enhancedMode === true) {
       setEnhancedView(true);
-      console.log("[Content] Enhanced mode loaded from storage ✅");
     }
   } catch (error) {
     console.log("[Content] Could not load enhanced mode from storage:", error);
@@ -413,8 +409,6 @@ for (const [oldId, newId] of Object.entries(replaceUrls)) {
 // ─── Init on grades page ────────────────────────────────────────────
 
 if (pageId === "21311") {
-  console.log("[Content] On grades page, looking for .div_noten");
-
   const initApp = () => {
     const gradesDiv = document.querySelector(".div_noten");
     if (!gradesDiv) {
@@ -434,8 +428,6 @@ if (pageId === "21311") {
 
     // Mark all grade cells with data attributes for CSS coloring
     markGradeCells();
-
-    console.log("[Content] Summary bar injected ✅");
   };
 
   if (document.readyState === "loading") {

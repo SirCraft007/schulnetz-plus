@@ -11,15 +11,11 @@ function Popup() {
   const [enhanced, setEnhanced] = useState(false);
 
   const checkCurrentPage = async () => {
-    console.log("[Popup] checkCurrentPage called");
     try {
-      console.log("[Popup] Querying active tab...");
       const [tab] = await chrome.tabs.query({
         active: true,
         currentWindow: true,
       });
-
-      console.log("[Popup] Active tab:", tab);
 
       if (!tab?.id) {
         console.error("[Popup] No tab ID found");
@@ -64,15 +60,11 @@ function Popup() {
   }, []);
 
   const handleDownload = async () => {
-    console.log("[Popup] Download button clicked");
     try {
-      console.log("[Popup] Querying active tab...");
       const [tab] = await chrome.tabs.query({
         active: true,
         currentWindow: true,
       });
-
-      console.log("[Popup] Active tab:", tab);
 
       if (!tab?.id) {
         console.error("[Popup] No tab ID found");
@@ -81,11 +73,9 @@ function Popup() {
         return;
       }
 
-      console.log("[Popup] Sending downloadGrades message to tab", tab.id);
       const response = await chrome.tabs.sendMessage(tab.id, {
         action: "downloadGrades",
       });
-      console.log("[Popup] Response from content script:", response);
       setMessage("Download gestartet!");
       setTimeout(() => setMessage(""), 2000);
     } catch (error) {
@@ -96,15 +86,11 @@ function Popup() {
   };
 
   const handleCopy = async () => {
-    console.log("[Popup] Copy button clicked");
     try {
-      console.log("[Popup] Querying active tab...");
       const [tab] = await chrome.tabs.query({
         active: true,
         currentWindow: true,
       });
-
-      console.log("[Popup] Active tab:", tab);
 
       if (!tab?.id) {
         console.error("[Popup] No tab ID found");
@@ -113,12 +99,9 @@ function Popup() {
         return;
       }
 
-      console.log("[Popup] Sending copyGrades message to tab", tab.id);
       const response = await chrome.tabs.sendMessage(tab.id, {
         action: "copyGrades",
       });
-
-      console.log("[Popup] Response from content script:", response);
 
       if (response?.success) {
         setMessage("In Zwischenablage kopiert!");
