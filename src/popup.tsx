@@ -48,21 +48,17 @@ function Popup() {
     checkCurrentPage();
   }, []);
 
-  // Sync enhanced state from page on popup open
+  // Sync enhanced state from storage on popup open
   useEffect(() => {
     (async () => {
       try {
-        const [tab] = await chrome.tabs.query({
-          active: true,
-          currentWindow: true,
-        });
-        if (!tab?.id) return;
-        const res = await chrome.tabs.sendMessage(tab.id, {
-          action: "getEnhanced",
-        });
-        if (res) setEnhanced(!!res.enabled);
+        // Load from Chrome storage
+        const result = await chrome.storage.local.get("enhancedMode");
+        if (result.enhancedMode !== undefined) {
+          setEnhanced(!!result.enhancedMode);
+        }
       } catch {
-        /* ignore - content script not available */
+        /* ignore - storage not available */
       }
     })();
   }, []);
@@ -169,14 +165,32 @@ function Popup() {
         active: true,
         currentWindow: true,
       });
-      if (!tab?.id) return;
       const newState = !enhanced;
-      await chrome.tabs.sendMessage(tab.id, {
-        action: "toggleEnhanced",
-        enabled: newState,
-      });
+
+      // Save to Chrome storage
+      await chrome.storage.local
+        .set({ enhancedMode: newState })
+        .catch((error) => {
+          console.error("[Popup] Error saving to storage:", error);
+        });
       setEnhanced(newState);
-    } catch {
+
+      // Also notify content script if tab is available
+      if (tab?.id) {
+        try {
+          await chrome.tabs.sendMessage(tab.id, {
+            action: "toggleEnhanced",
+            enabled: newState,
+          });
+        } catch (error) {
+          console.error(
+            "[Popup] Error sending message to content script:",
+            error,
+          );
+        }
+      }
+    } catch (error) {
+      console.error("[Popup] Error in handleToggleEnhanced:", error);
       setMessage("Fehler");
       setTimeout(() => setMessage(""), 2000);
     }

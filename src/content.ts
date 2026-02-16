@@ -351,6 +351,10 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     sendResponse({ exists: !!document.querySelector(".div_noten") });
   } else if (request.action === "toggleEnhanced") {
     const isOn = setEnhancedView(!!request.enabled);
+    // Save to storage
+    chrome.storage.local.set({ enhancedMode: isOn }).catch((error) => {
+      console.error("[Content] Error saving enhanced mode to storage:", error);
+    });
     sendResponse({ enabled: isOn });
   } else if (request.action === "getEnhanced") {
     sendResponse({
@@ -359,6 +363,20 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   }
   return false;
 });
+
+// ─── Load enhanced state from storage on init ────────────────────
+
+(async () => {
+  try {
+    const result = await chrome.storage.local.get("enhancedMode");
+    if (result.enhancedMode === true) {
+      setEnhancedView(true);
+      console.log("[Content] Enhanced mode loaded from storage ✅");
+    }
+  } catch (error) {
+    console.log("[Content] Could not load enhanced mode from storage:", error);
+  }
+})();
 
 // ─── URL rewriting ──────────────────────────────────────────────────
 
