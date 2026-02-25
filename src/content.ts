@@ -22,6 +22,20 @@ interface GradeData {
   courses: Course[];
 }
 
+const MIN_GRADE = 1;
+const MAX_GRADE = 6;
+
+function parseNumber(text: string): number | null {
+  const normalized = text.replace(",", ".").trim();
+  if (!normalized) return null;
+  const value = Number.parseFloat(normalized);
+  return Number.isFinite(value) ? value : null;
+}
+
+function isValidCourseAverage(value: number | null): value is number {
+  return value !== null && value >= MIN_GRADE && value <= MAX_GRADE;
+}
+
 // ─── Grade extraction ───────────────────────────────────────────────
 
 function extractGrades(): GradeData | null {
@@ -44,10 +58,15 @@ function extractGrades(): GradeData | null {
   if (!table) return data;
 
   const rows = Array.from(table.querySelectorAll("tbody > tr")).filter(
-    (row) =>
-      !row.className.includes("detailrow") &&
-      !row.id.includes("verlauf") &&
-      row.querySelector("td b"),
+    (row) => {
+      if (row.className.includes("detailrow") || row.id.includes("verlauf")) {
+        return false;
+      }
+      const hasCourseLabel = !!row.querySelector("td b");
+      const hasDetailButton =
+        !!row.querySelector("button[onclick*='toggle_notendetails']");
+      return hasCourseLabel && hasDetailButton;
+    },
   );
 
   rows.forEach((row) => {
@@ -58,11 +77,12 @@ function extractGrades(): GradeData | null {
     const courseName =
       cells[0].querySelector("br")?.nextSibling?.textContent?.trim() ?? "";
     const averageText = cells[1].textContent?.trim() ?? "";
+    const parsedAverage = parseNumber(averageText);
 
     const course: Course = {
       code: courseInfo,
       name: courseName,
-      average: averageText === "--" ? null : parseFloat(averageText) || null,
+      average: isValidCourseAverage(parsedAverage) ? parsedAverage : null,
       assessments: [],
     };
 
@@ -93,11 +113,12 @@ function extractGrades(): GradeData | null {
           const aCells = aRow.querySelectorAll("td");
           if (aCells.length >= 5) {
             const gradeText = aCells[3].textContent?.trim() ?? "";
+            const parsedAssessmentGrade = parseNumber(gradeText);
             course.assessments.push({
               date: aCells[1].textContent?.trim() ?? "",
               topic: aCells[2].textContent?.trim() ?? "",
-              grade: gradeText === "" ? null : parseFloat(gradeText),
-              weight: parseFloat(aCells[4].textContent?.trim() ?? "0"),
+              grade: parsedAssessmentGrade,
+              weight: parseNumber(aCells[4].textContent?.trim() ?? "") ?? 0,
             });
           }
         });
@@ -115,7 +136,7 @@ function extractGrades(): GradeData | null {
 function calculatePlusPoints(courses: Course[]): number {
   let pp = 0;
   for (const c of courses) {
-    if (c.average === null) continue;
+    if (!isValidCourseAverage(c.average)) continue;
     if (c.average >= 4) {
       pp += Math.floor((c.average - 4) / 0.5) * 0.5;
     } else {
@@ -173,14 +194,14 @@ async function copyGradesToClipboard(): Promise<boolean> {
 function buildSummaryBar(gradeData: GradeData): HTMLElement {
   const pp = calculatePlusPoints(gradeData.courses);
   const above4 = gradeData.courses.filter(
-    (c) => c.average !== null && c.average >= 4,
+    (c) => isValidCourseAverage(c.average) && c.average >= 4,
   ).length;
   const below4 = gradeData.courses.filter(
-    (c) => c.average !== null && c.average < 4,
+    (c) => isValidCourseAverage(c.average) && c.average < 4,
   ).length;
   const allAvgs = gradeData.courses
     .map((c) => c.average)
-    .filter((a): a is number => a !== null);
+    .filter(isValidCourseAverage);
   const totalAvg =
     allAvgs.length > 0
       ? (allAvgs.reduce((s, v) => s + v, 0) / allAvgs.length).toFixed(2)
@@ -233,9 +254,9 @@ function markGradeCells(): void {
 
     const gradeCell = cells[1];
     const gradeText = gradeCell.textContent?.trim() ?? "";
-    const grade = gradeText === "--" ? null : parseFloat(gradeText);
+    const grade = parseNumber(gradeText);
 
-    if (grade !== null && !isNaN(grade)) {
+    if (isValidCourseAverage(grade)) {
       gradeCell.setAttribute("data-grade", grade.toString());
     }
   });
