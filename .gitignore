@@ -55,3 +55,5 @@ noten-div*.html
 *page.html
 grades*.json
 *.csv
+
+*.xpi
