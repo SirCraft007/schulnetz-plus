@@ -1,0 +1,205 @@
+.snplus-accounting {
+	--snplus-accent: #4f46e5;
+	--snplus-accent-soft: #e0e7ff;
+	--snplus-bg: #f8fafc;
+	--snplus-text: #0f172a;
+	--snplus-muted: #64748b;
+	--snplus-border: #e2e8f0;
+	--snplus-positive: #16a34a;
+	--snplus-positive-bg: #ecfdf5;
+	--snplus-negative: #dc2626;
+	--snplus-negative-bg: #fef2f2;
+
+	color: var(--snplus-text);
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-title {
+	margin: 0 0 10px;
+	font-size: clamp(1.3rem, 2.4vw, 1.75rem);
+	font-weight: 800;
+	letter-spacing: 0.01em;
+	color: #1e1b4b;
+}
+
+.snplus-accounting.snplus-accounting-enhanced > br {
+	display: none;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-person-table {
+	border-collapse: separate;
+	border-spacing: 0;
+	width: min(100%, 420px);
+	margin: 0 0 18px;
+	background: #fff;
+	border: 1px solid var(--snplus-border);
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 8px 20px rgba(2, 6, 23, 0.04);
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-person-table td {
+	padding: 10px 14px;
+	font-size: 14px;
+	border-bottom: 1px solid #f1f5f9;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-person-table tr:last-child td {
+	border-bottom: 0;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-person-table td:first-child {
+	color: var(--snplus-muted);
+	width: 120px;
+	font-weight: 600;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-summary {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 10px;
+	margin: 12px 0 14px;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-stat {
+	padding: 11px 12px;
+	border-radius: 12px;
+	border: 1px solid var(--snplus-border);
+	background: #fff;
+	box-shadow: 0 6px 16px rgba(2, 6, 23, 0.04);
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-stat-label {
+	display: block;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--snplus-muted);
+	margin-bottom: 3px;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-stat-value {
+	font-size: 18px;
+	font-weight: 800;
+	letter-spacing: 0.01em;
+	color: var(--snplus-text);
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-stat[data-tone="positive"] {
+	border-color: #bbf7d0;
+	background: var(--snplus-positive-bg);
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-stat[data-tone="positive"]
+	.snplus-accounting-stat-value {
+	color: var(--snplus-positive);
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-stat[data-tone="negative"] {
+	border-color: #fecaca;
+	background: var(--snplus-negative-bg);
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-stat[data-tone="negative"]
+	.snplus-accounting-stat-value {
+	color: var(--snplus-negative);
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-transactions {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	overflow: hidden;
+	border-radius: 12px;
+	border: 1px solid var(--snplus-border);
+	background: #fff;
+	box-shadow: 0 10px 24px rgba(2, 6, 23, 0.06);
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-transactions tr[bgcolor] {
+	background: transparent !important;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-transactions tbody > tr:first-child td {
+	background: linear-gradient(180deg, #eef2ff 0%, #e0e7ff 100%);
+	color: #312e81;
+	font-weight: 700;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-transactions td {
+	padding: 10px 12px;
+	border-bottom: 1px solid #f1f5f9;
+	font-size: 14px;
+	line-height: 1.4;
+	white-space: nowrap;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-transactions td:nth-child(2) {
+	white-space: normal;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-transactions .snplus-accounting-row:hover td {
+	background: #f8fafc;
+}
+
+.snplus-accounting.snplus-accounting-enhanced
+	.snplus-accounting-transactions
+	.snplus-accounting-row:nth-child(even)
+	td {
+	background: #fcfdff;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-transactions [data-sign="positive"] {
+	color: var(--snplus-positive);
+	font-weight: 700;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-transactions [data-sign="negative"] {
+	color: var(--snplus-negative);
+	font-weight: 700;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-transactions .greenft,
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-transactions .redft {
+	color: inherit;
+	font-weight: inherit;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-total-row td {
+	border-bottom: 0;
+	background: #f8fafc;
+	font-weight: 700;
+}
+
+.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-total-row td:last-child {
+	font-size: 16px;
+}
+
+.snplus-accounting.snplus-accounting-enhanced p {
+	margin-top: 14px;
+	color: var(--snplus-muted);
+	font-size: 13px;
+}
+
+.snplus-accounting.snplus-accounting-enhanced p a {
+	color: var(--snplus-accent);
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.snplus-accounting.snplus-accounting-enhanced p a:hover {
+	text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+	.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-transactions td {
+		padding: 9px 9px;
+		font-size: 13px;
+	}
+
+	.snplus-accounting.snplus-accounting-enhanced .snplus-accounting-summary {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+

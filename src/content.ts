@@ -1,5 +1,9 @@
 import "./content.css";
 import { GRADES_PAGE_ID, initGradesPage } from "./pages/grades/content";
+import {
+  ACCOUNTING_PAGE_ID,
+  initAccountingPage,
+} from "./pages/accounting/content";
 
 type PageInitializer = () => void;
 
@@ -11,6 +15,7 @@ declare global {
 
 const pageInitializersById: Record<string, PageInitializer> = {
   [GRADES_PAGE_ID]: initGradesPage,
+  [ACCOUNTING_PAGE_ID]: initAccountingPage,
 };
 
 // ─── URL rewriting ──────────────────────────────────────────────────
