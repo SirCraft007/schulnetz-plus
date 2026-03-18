@@ -7,7 +7,7 @@ import {
   type Course,
   type GradeData,
 } from "./gradeExtraction";
-import "./grades.css";
+import "./content.css";
 
 export const GRADES_PAGE_ID = "21311";
 

@@ -1,5 +1,5 @@
 import "./content.css";
-import { GRADES_PAGE_ID, initGradesPage } from "./pages/grades";
+import { GRADES_PAGE_ID, initGradesPage } from "./pages/grades/content";
 
 type PageInitializer = () => void;
 

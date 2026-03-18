@@ -50,11 +50,11 @@
 }
 
 .snplus-enhanced [data-grade-band="yellow"] {
-  color: #eab308;
+  color: #df8d06;
 }
 
 .snplus-enhanced [data-grade-band="red"] {
-  color: #ef4444;
+  color: #ef4444 !important;
 }
 
 .snplus-enhanced .snplus-summary-bar {
