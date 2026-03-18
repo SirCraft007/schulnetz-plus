@@ -7,6 +7,7 @@ import {
   type Course,
   type GradeData,
 } from "../gradeExtraction";
+import "./grades.css";
 
 export const GRADES_PAGE_ID = "21311";
 
@@ -14,7 +15,31 @@ type CourseInclusionMap = Record<string, boolean>;
 
 const COURSE_INCLUSION_STORAGE_KEY = "snplusCourseInclusion";
 
+const GRADE_BANDS = {
+  redBelow: 4,
+  yellowBelow: 4.5,
+  greenBelow: 5.5,
+} as const;
+
+type GradeBand = "red" | "yellow" | "green" | "excellent";
+
 let gradesMessageListenerRegistered = false;
+
+function getGradeBand(value: number): GradeBand {
+  if (value < GRADE_BANDS.redBelow) return "red";
+  if (value < GRADE_BANDS.yellowBelow) return "yellow";
+  if (value < GRADE_BANDS.greenBelow) return "green";
+  return "excellent";
+}
+
+function applyGradeAttributes(element: Element, value: number | null): void {
+  if (!isValidCourseAverage(value)) {
+    element.removeAttribute("data-grade-band");
+    return;
+  }
+
+  element.setAttribute("data-grade-band", getGradeBand(value));
+}
 
 function courseKey(course: Course, index: number): string {
   const code = course.code?.trim() || `course-${index}`;
@@ -136,7 +161,7 @@ function updateSummaryBarValues(
 
   if (avgEl) {
     avgEl.textContent = totalAvg;
-    avgEl.setAttribute("data-grade", totalAvg);
+    applyGradeAttributes(avgEl, parseNumber(totalAvg));
   }
   if (ppEl) ppEl.textContent = `${pp >= 0 ? "+" : ""}${pp.toFixed(1)}`;
   if (aboveEl) aboveEl.textContent = String(above4);
@@ -283,103 +308,35 @@ function markGradeCells(): void {
     const gradeCell = cells[1];
     const gradeText = gradeCell.textContent?.trim() ?? "";
     const grade = parseNumber(gradeText);
+    applyGradeAttributes(gradeCell, grade);
+  });
 
-    if (isValidCourseAverage(grade)) {
-      gradeCell.setAttribute("data-grade", grade.toString());
+  const assessmentRows = gradesDiv.querySelectorAll("table.clean tr");
+  assessmentRows.forEach((row) => {
+    const cells = row.querySelectorAll("td");
+    if (cells.length < 4) return;
+
+    const assessmentGradeCell = cells[3];
+    if (!assessmentGradeCell?.classList.contains("td_einzelpruefungen")) {
+      return;
     }
+
+    const gradeText = assessmentGradeCell.textContent?.trim() ?? "";
+    const grade = parseNumber(gradeText);
+    applyGradeAttributes(assessmentGradeCell, grade);
+  });
+
+  const groupAverageValues = gradesDiv.querySelectorAll(
+    "tr.last_line_top_pruefungsgruppe i",
+  );
+  groupAverageValues.forEach((el) => {
+    const text = el.textContent?.trim() ?? "";
+    const value = parseNumber(text);
+    applyGradeAttributes(el, value);
   });
 }
 
-function injectEnhancedStyles(): void {
-  if (document.getElementById("snplus-enhanced-table")) return;
-  const style = document.createElement("style");
-  style.id = "snplus-enhanced-table";
-  style.textContent = `
-		.snplus-enhanced .div_noten table.mdl-data-table {
-			border-collapse: separate;
-			border-spacing: 0;
-			border-radius: 8px;
-			overflow: hidden;
-			box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.06);
-		}
-		.snplus-enhanced .div_noten table.mdl-data-table th {
-			background: #f0f4ff;
-			font-weight: 600;
-			font-size: 13px;
-			text-transform: uppercase;
-			letter-spacing: .04em;
-			color: #4338ca;
-			padding: 10px 14px;
-		}
-		.snplus-enhanced .div_noten table.mdl-data-table td {
-			padding: 10px 14px;
-			vertical-align: middle;
-		}
-		.snplus-enhanced .div_noten table.mdl-data-table tbody tr:hover {
-			background: #f8faff;
-		}
-		.snplus-enhanced .div_noten table.mdl-data-table td b {
-			color: #1e3a5f;
-		}
-		.snplus-enhanced .div_noten h3 {
-			font-size: 20px;
-			font-weight: 700;
-			color: #1e293b;
-		}
-		.snplus-enhanced .div_noten table.mdl-data-table td[data-grade] {
-			font-weight: 600;
-		}
-		.snplus-enhanced .div_noten table.mdl-data-table td[data-grade]:is([data-grade^="6"], [data-grade^="5.5"], [data-grade^="5.6"], [data-grade^="5.7"], [data-grade^="5.8"], [data-grade^="5.9"]) {
-			color: #16a34a;
-		}
-		.snplus-enhanced .div_noten table.mdl-data-table td[data-grade]:is([data-grade^="5."], [data-grade^="4.5"], [data-grade^="4.6"], [data-grade^="4.7"], [data-grade^="4.8"], [data-grade^="4.9"]) {
-			color: #22c55e;
-		}
-		.snplus-enhanced .div_noten table.mdl-data-table td[data-grade]:is([data-grade^="4.0"], [data-grade^="4.1"], [data-grade^="4.2"], [data-grade^="4.3"], [data-grade^="4.4"]) {
-			color: #eab308;
-		}
-		.snplus-enhanced .div_noten table.mdl-data-table td[data-grade]:is([data-grade^="3"], [data-grade^="2"], [data-grade^="1"]) {
-			color: #ef4444;
-		}
-		.snplus-enhanced .snplus-summary-bar {
-			background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
-			border-color: #c7d2fe;
-		}
-		.snplus-enhanced .snplus-stat-value[data-grade]:is([data-grade^="6"], [data-grade^="5.5"], [data-grade^="5.6"], [data-grade^="5.7"], [data-grade^="5.8"], [data-grade^="5.9"]) {
-			color: #16a34a;
-		}
-		.snplus-enhanced .snplus-stat-value[data-grade]:is([data-grade^="5."], [data-grade^="4.5"], [data-grade^="4.6"], [data-grade^="4.7"], [data-grade^="4.8"], [data-grade^="4.9"]) {
-			color: #22c55e;
-		}
-		.snplus-enhanced .snplus-stat-value[data-grade]:is([data-grade^="4.0"], [data-grade^="4.1"], [data-grade^="4.2"], [data-grade^="4.3"], [data-grade^="4.4"]) {
-			color: #eab308;
-		}
-		.snplus-enhanced .snplus-stat-value[data-grade]:is([data-grade^="3"], [data-grade^="2"], [data-grade^="1"]) {
-			color: #ef4444;
-		}
-		.snplus-course-toggle {
-			margin-left: 10px;
-			display: inline-flex;
-			align-items: center;
-			gap: 6px;
-			font-size: 12px;
-			color: #64748b;
-			user-select: none;
-		}
-		.snplus-course-toggle input {
-			margin: 0;
-			width: 14px;
-			height: 14px;
-		}
-    .snplus-enhanced .snplus-hidden-actions-cell {
-			display: none !important;
-		}
-	`;
-  document.head.appendChild(style);
-}
-
 function setEnhancedView(on: boolean): boolean {
-  injectEnhancedStyles();
   document.body.classList.toggle("snplus-enhanced", on);
   updateLastTwoRowsVisibility(on);
   return on;
