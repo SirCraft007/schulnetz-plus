@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { EXTRACTOR_VERSION } from "./version";
 import "./popup.css";
+import { NotenPopup } from "./noten_popup";
 
 type PageStatus = "loading" | "valid" | "invalid";
 
@@ -10,31 +11,34 @@ function Popup() {
   const [pageStatus, setPageStatus] = useState<PageStatus>("loading");
   const [enhanced, setEnhanced] = useState(false);
 
+  const getActiveTabId = async () => {
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+
+    if (!tab?.id) {
+      console.error("[Popup] No tab ID found");
+      return null;
+    }
+
+    return tab.id;
+  };
+
   const checkCurrentPage = async () => {
     try {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
-      });
-
-      if (!tab?.id) {
-        console.error("[Popup] No tab ID found");
+      const tabId = await getActiveTabId();
+      if (!tabId) {
         setPageStatus("invalid");
         return;
       }
 
-      // Check if the grades div exists on the page
-      const response = await chrome.tabs.sendMessage(tab.id!, {
+      const response = await chrome.tabs.sendMessage(tabId, {
         action: "checkPage",
       });
 
-      if (response?.exists) {
-        setPageStatus("valid");
-      } else {
-        setPageStatus("invalid");
-      }
+      setPageStatus(response?.exists ? "valid" : "invalid");
     } catch (error) {
-      // Content script not loaded on this page - this is expected for non-schulnetz pages
       console.log("[Popup] Content script not available on this page");
       setPageStatus("invalid");
     }
@@ -59,63 +63,6 @@ function Popup() {
     })();
   }, []);
 
-  const handleDownload = async () => {
-    try {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
-      });
-
-      if (!tab?.id) {
-        console.error("[Popup] No tab ID found");
-        setMessage("Kein Tab gefunden");
-        setTimeout(() => setMessage(""), 2000);
-        return;
-      }
-
-      const response = await chrome.tabs.sendMessage(tab.id, {
-        action: "downloadGrades",
-      });
-      setMessage("Download gestartet!");
-      setTimeout(() => setMessage(""), 2000);
-    } catch (error) {
-      console.log("[Popup] Error in handleDownload:", error);
-      setMessage("Fehler beim Download");
-      setTimeout(() => setMessage(""), 2000);
-    }
-  };
-
-  const handleCopy = async () => {
-    try {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
-      });
-
-      if (!tab?.id) {
-        console.error("[Popup] No tab ID found");
-        setMessage("Kein Tab gefunden");
-        setTimeout(() => setMessage(""), 2000);
-        return;
-      }
-
-      const response = await chrome.tabs.sendMessage(tab.id, {
-        action: "copyGrades",
-      });
-
-      if (response?.success) {
-        setMessage("In Zwischenablage kopiert!");
-      } else {
-        setMessage("Kopieren fehlgeschlagen");
-      }
-      setTimeout(() => setMessage(""), 2000);
-    } catch (error) {
-      console.log("[Popup] Error in handleCopy:", error);
-      setMessage("Fehler beim Kopieren");
-      setTimeout(() => setMessage(""), 2000);
-    }
-  };
-
   if (pageStatus === "loading") {
     return (
       <div className="p-4 text-white bg-gray-900 w-72">
@@ -127,27 +74,9 @@ function Popup() {
     );
   }
 
-  if (pageStatus === "invalid") {
-    return (
-      <div className="p-4 text-white bg-gray-900 w-72">
-        <div className="text-center">
-          <div className="mb-2 text-4xl">📚</div>
-          <h1 className="mb-2 text-lg font-bold">Schulnetz+</h1>
-          <p className="text-sm text-gray-400">
-            Bitte öffne die Notenseite auf Schulnetz, um diese Funktion zu
-            nutzen.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   const handleToggleEnhanced = async () => {
     try {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
-      });
+      const tabId = await getActiveTabId();
       const newState = !enhanced;
 
       // Save to Chrome storage
@@ -159,9 +88,9 @@ function Popup() {
       setEnhanced(newState);
 
       // Also notify content script if tab is available
-      if (tab?.id) {
+      if (tabId) {
         try {
-          await chrome.tabs.sendMessage(tab.id, {
+          await chrome.tabs.sendMessage(tabId, {
             action: "toggleEnhanced",
             enabled: newState,
           });
@@ -187,23 +116,17 @@ function Popup() {
         <p className="text-sm text-gray-400">Noten exportieren</p>
       </div>
 
+      {pageStatus === "valid" ? (
+        <div className="mb-3">
+          <NotenPopup />
+        </div>
+      ) : (
+        <div className="p-3 mb-4 text-sm text-center text-yellow-300 bg-gray-800 rounded-lg">
+          Öffne die Notenansicht, um Exportfunktionen zu nutzen.
+        </div>
+      )}
+
       <div className="space-y-2">
-        <button
-          onClick={handleDownload}
-          className="flex items-center justify-center w-full gap-2 px-4 py-2 font-medium transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
-        >
-          <span>⬇️</span>
-          Als JSON herunterladen
-        </button>
-
-        <button
-          onClick={handleCopy}
-          className="flex items-center justify-center w-full gap-2 px-4 py-2 font-medium transition-colors bg-gray-700 rounded-lg hover:bg-gray-600"
-        >
-          <span>📋</span>
-          In Zwischenablage kopieren
-        </button>
-
         <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
           <span className="text-sm font-medium">✨ Schönere Ansicht</span>
           <button

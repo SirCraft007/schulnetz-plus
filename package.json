@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build",
-    "xpi": "pnpm build && cd dist && zip -r ../schulnetz-plus-$(node -p \"require('./manifest.json').version\").xpi ."
+    "xpi": "pnpm build && pnpm dlx web-ext build --source-dir dist --artifacts-dir . --filename schulnetz-plus-{version}.xpi --overwrite-dest"
   },
   "keywords": [],
   "author": "",
