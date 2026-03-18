@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { EXTRACTOR_VERSION } from "./version";
 import "./popup.css";
-import { NotenPopup } from "./noten_popup";
+import { NotenPopup } from "./pages/noten_popup";
 
 type PageStatus = "loading" | "valid" | "invalid";
 

@@ -6,7 +6,7 @@ import {
   parseNumber,
   type Course,
   type GradeData,
-} from "../gradeExtraction";
+} from "./gradeExtraction";
 import "./grades.css";
 
 export const GRADES_PAGE_ID = "21311";
