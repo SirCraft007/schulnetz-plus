@@ -317,12 +317,10 @@ function markGradeCells(): void {
     if (cells.length < 4) return;
 
     const assessmentGradeCell = cells[3];
-    if (!assessmentGradeCell?.classList.contains("td_einzelpruefungen")) {
-      return;
-    }
-
     const gradeText = assessmentGradeCell.textContent?.trim() ?? "";
     const grade = parseNumber(gradeText);
+    if (!isValidCourseAverage(grade)) return;
+
     applyGradeAttributes(assessmentGradeCell, grade);
   });
 

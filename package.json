@@ -1,12 +1,19 @@
 {
   "name": "schulnetz-extention",
-  "version": "1.0.0",
+  "version": "0.2.1",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "sync:version": "tsx scripts/sync-version.ts",
+    "predev": "pnpm sync:version",
     "dev": "vite build --watch",
+    "prebuild": "pnpm sync:version",
+    "prepack": "pnpm sync:version",
     "build": "vite build",
-    "xpi": "pnpm build && pnpm dlx web-ext build --source-dir dist --artifacts-dir . --filename schulnetz-plus-{version}.xpi --overwrite-dest"
+    "lint": "pnpm build && pnpm dlx web-ext lint --source-dir dist",
+    "xpi": "pnpm build && pnpm dlx web-ext build --source-dir dist --artifacts-dir . --filename schulnetz-plus-{version}.xpi --overwrite-dest",
+    "xpi:sign": "pnpm build && pnpm dlx web-ext sign --source-dir dist --artifacts-dir . --channel unlisted --api-key \"$AMO_JWT_ISSUER\" --api-secret \"$AMO_JWT_SECRET\"",
+    "xpi:release": "pnpm xpi && pnpm xpi:sign"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +28,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.27",
     "postcss": "^8.5.8",
+    "tsx": "^4.20.6",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "vite": "^8.0.1"

@@ -1,4 +1,4 @@
 /**
- * Extension version - increment when making changes to the extraction logic
+ * Extension version - managed via package.json
  */
-export const EXTRACTOR_VERSION = "1.1.0";
+export const EXTRACTOR_VERSION = "0.2.1";
