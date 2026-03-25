@@ -57,3 +57,4 @@ grades*.json
 *.csv
 
 *.xpi
+.env
