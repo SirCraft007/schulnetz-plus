@@ -1,6 +1,6 @@
 {
   "name": "schulnetz-extention",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,9 +11,7 @@
     "prepack": "pnpm sync:version",
     "build": "vite build",
     "lint": "pnpm build && pnpm dlx web-ext lint --source-dir dist",
-    "xpi": "pnpm build && pnpm dlx web-ext build --source-dir dist --artifacts-dir . --filename schulnetz-plus-{version}.xpi --overwrite-dest",
-    "xpi:sign": "pnpm build && pnpm dlx web-ext sign --source-dir dist --artifacts-dir . --channel unlisted --api-key \"$AMO_JWT_ISSUER\" --api-secret \"$AMO_JWT_SECRET\"",
-    "xpi:release": "pnpm xpi && pnpm xpi:sign"
+    "xpi": "pnpm build && pnpm dlx web-ext build --source-dir dist --artifacts-dir . --filename schulnetz-plus-{version}.xpi --overwrite-dest"
   },
   "keywords": [],
   "author": "",
