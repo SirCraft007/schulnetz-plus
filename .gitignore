@@ -58,3 +58,4 @@ grades*.json
 
 *.xpi
 .env
+scripts/*.user.js
