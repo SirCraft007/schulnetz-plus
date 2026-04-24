@@ -10,6 +10,7 @@ type PageInitializer = () => void;
 declare global {
   interface Window {
     toggleNavDrawer?: () => void;
+    xajax_reset_timeout?: () => void;
   }
 }
 
@@ -136,3 +137,11 @@ if (document.readyState === "complete") {
 if (pageId) {
   pageInitializersById[pageId]?.();
 }
+
+const TEN_MINUTES_MS = 10 * 60 * 1000;
+
+setInterval(() => {
+  if (typeof window.xajax_reset_timeout === "function") {
+    window.xajax_reset_timeout();
+  }
+}, TEN_MINUTES_MS);

@@ -32,6 +32,10 @@ function getGradeBand(value: number): GradeBand {
   return "excellent";
 }
 
+function roundToNearestHalf(value: number): number {
+  return Math.round(value * 2) / 2;
+}
+
 function applyGradeAttributes(element: Element, value: number | null): void {
   if (!isValidCourseAverage(value)) {
     element.removeAttribute("data-grade-band");
@@ -67,19 +71,6 @@ async function saveCourseInclusionMap(map: CourseInclusionMap): Promise<void> {
   }
 }
 
-function calculatePlusPoints(courses: Course[]): number {
-  let pp = 0;
-  for (const c of courses) {
-    if (!isValidCourseAverage(c.average)) continue;
-    if (c.average >= 4) {
-      pp += Math.floor((c.average - 4) / 0.5) * 0.5;
-    } else {
-      pp -= 1;
-    }
-  }
-  return pp;
-}
-
 function isCourseIncluded(
   course: Course,
   index: number,
@@ -96,6 +87,44 @@ function getIncludedCourses(
   return courses.filter((course, index) =>
     isCourseIncluded(course, index, inclusionMap),
   );
+}
+
+function summarizeCourses(courses: Course[]): {
+  plusPoints: number;
+  above4: number;
+  below4: number;
+  averageText: string;
+} {
+  let plusPoints = 0;
+  let above4 = 0;
+  let below4 = 0;
+  let sum = 0;
+  let count = 0;
+
+  for (const course of courses) {
+    if (!isValidCourseAverage(course.average)) continue;
+
+    const average = course.average;
+    const roundedAverage = roundToNearestHalf(average);
+
+    sum += average;
+    count += 1;
+
+    if (roundedAverage >= 4) {
+      plusPoints += Math.floor((roundedAverage - 4) / 0.5) * 0.5;
+      above4 += 1;
+    } else {
+      plusPoints -= 1;
+      below4 += 1;
+    }
+  }
+
+  return {
+    plusPoints,
+    above4,
+    below4,
+    averageText: count > 0 ? (sum / count).toFixed(2) : "--",
+  };
 }
 
 function downloadGradesJSON() {
@@ -133,18 +162,8 @@ function updateSummaryBarValues(
   summaryBar: HTMLElement,
   courses: Course[],
 ): void {
-  const pp = calculatePlusPoints(courses);
-  const above4 = courses.filter(
-    (c) => isValidCourseAverage(c.average) && c.average >= 4,
-  ).length;
-  const below4 = courses.filter(
-    (c) => isValidCourseAverage(c.average) && c.average < 4,
-  ).length;
-  const allAvgs = courses.map((c) => c.average).filter(isValidCourseAverage);
-  const totalAvg =
-    allAvgs.length > 0
-      ? (allAvgs.reduce((s, v) => s + v, 0) / allAvgs.length).toFixed(2)
-      : "--";
+  const { plusPoints: pp, above4, below4, averageText: totalAvg } =
+    summarizeCourses(courses);
 
   const avgEl = summaryBar.querySelector(
     "[data-snplus-summary='average']",
