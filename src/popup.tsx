@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { EXTRACTOR_VERSION } from "./version";
 import "./popup.css";
 import { NotenPopup } from "./pages/grades/noten_popup";
 
@@ -151,7 +150,7 @@ function Popup() {
       )}
 
       <div className="mt-4 text-xs text-center text-gray-500">
-        Version {EXTRACTOR_VERSION}
+        Version {chrome.runtime.getManifest().version}
       </div>
     </div>
   );

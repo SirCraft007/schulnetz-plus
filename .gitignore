@@ -57,5 +57,7 @@ grades*.json
 *.csv
 
 *.xpi
+source.zip
+web-ext-artifacts/
 .env
 scripts/*.user.js

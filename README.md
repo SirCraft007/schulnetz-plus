@@ -68,19 +68,36 @@ Build and create an unsigned XPI in project root:
 pnpm xpi
 ```
 
-## Versioning
+## Publish to Firefox
 
-Version is defined in `package.json` and synced automatically before `dev`, `build`, and packaging.
+Firefox extensions must be signed by Mozilla. This repository is already set up with a stable Gecko ID in `public/manifest.json`, so the remaining steps are:
 
-Sync targets:
+1. Create an AMO developer account and generate API credentials.
+2. Add these GitHub repository secrets:
+   - `JWT_USER`
+   - `JWT_SECRET`
+3. Push to `main`; the workflow in `.github/workflows/publish-firefox.yml` builds the extension and submits it to AMO with `web-ext sign`.
 
-- `public/manifest.json`
-- `src/version.ts`
+The workflow also uploads a source archive made from the tracked files, which is the safer setup for AMO review.
 
-Sync script:
+The AMO submission metadata lives in `.github/amo-metadata.json`. The first submission needs a summary, category, and license; later updates reuse the existing listing metadata.
+
+To run the same publish flow locally:
 
 ```bash
-pnpm sync:version
+pnpm publish:firefox
+```
+
+## Versioning
+
+Version is defined in `package.json`.
+
+Whenever you run `pnpm build`, `pnpm dev`, or `pnpm version ...`, the manifest is synced automatically.
+
+If you need to force a sync, run:
+
+```bash
+pnpm exec tsx scripts/sync-manifest.ts
 ```
 
 ## Load in Firefox (temporary)
@@ -100,5 +117,5 @@ src/
     grades/             # grade page extraction + UI enhancements
     accounting/         # accounting page UI enhancements
 scripts/
-  sync-version.ts       # keeps manifest/version.ts in sync with package.json
+  sync-manifest.ts      # keeps public/manifest.json in sync with package.json
 ```

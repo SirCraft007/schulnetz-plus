@@ -1,17 +1,15 @@
 {
   "name": "schulnetz-extention",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "sync:version": "tsx scripts/sync-version.ts",
-    "predev": "pnpm sync:version",
-    "dev": "vite build --watch",
-    "prebuild": "pnpm sync:version",
-    "prepack": "pnpm sync:version",
-    "build": "vite build",
+    "dev": "pnpm exec tsx scripts/sync-manifest.ts && vite build --watch",
+    "build": "pnpm exec tsx scripts/sync-manifest.ts && vite build",
     "lint": "pnpm build && pnpm dlx web-ext lint --source-dir dist",
-    "xpi": "pnpm build && pnpm dlx web-ext build --source-dir dist --artifacts-dir . --filename schulnetz-plus-{version}.xpi --overwrite-dest"
+    "xpi": "pnpm build && pnpm dlx web-ext build --source-dir dist --artifacts-dir . --filename schulnetz-plus-{version}.xpi --overwrite-dest",
+    "publish:firefox": "sh -c 'set -a; . ./.env; set +a; pnpm build && git archive --format zip --output source.zip HEAD && pnpm dlx web-ext@8 sign --source-dir dist --channel listed --amo-metadata .github/amo-metadata.json --upload-source-code source.zip --approval-timeout 0 --api-key \"$JWT_USER\" --api-secret \"$JWT_SECRET\"'",
+    "postversion": "pnpm exec tsx scripts/sync-manifest.ts"
   },
   "keywords": [],
   "author": "",
