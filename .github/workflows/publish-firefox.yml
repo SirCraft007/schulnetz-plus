@@ -42,7 +42,7 @@ jobs:
           JWT_USER: ${{ secrets.JWT_USER }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
-          pnpm dlx web-ext@8 sign \
+          pnpm dlx --allow-build=spawn-sync web-ext@8 sign \
             --source-dir dist \
             --channel listed \
             --amo-metadata .github/amo-metadata.json \

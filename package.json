@@ -6,15 +6,15 @@
   "scripts": {
     "dev": "pnpm exec tsx scripts/sync-manifest.ts && vite build --watch",
     "build": "pnpm exec tsx scripts/sync-manifest.ts && vite build",
-    "lint": "pnpm build && pnpm dlx web-ext lint --source-dir dist",
-    "xpi": "pnpm build && pnpm dlx web-ext build --source-dir dist --artifacts-dir . --filename schulnetz-plus-{version}.xpi --overwrite-dest",
-    "publish:firefox": "sh -c 'set -a; . ./.env; set +a; pnpm build && git archive --format zip --output source.zip HEAD && pnpm dlx web-ext@8 sign --source-dir dist --channel listed --amo-metadata .github/amo-metadata.json --upload-source-code source.zip --approval-timeout 0 --api-key \"$JWT_USER\" --api-secret \"$JWT_SECRET\"'",
+    "lint": "pnpm build && pnpm dlx --allow-build=spawn-sync web-ext lint --source-dir dist",
+    "xpi": "pnpm build && pnpm dlx --allow-build=spawn-sync web-ext build --source-dir dist --artifacts-dir . --filename schulnetz-plus-{version}.xpi --overwrite-dest",
+    "publish:firefox": "sh -c 'set -a; . ./.env; set +a; pnpm build && git archive --format zip --output source.zip HEAD && pnpm dlx --allow-build=spawn-sync web-ext@8 sign --source-dir dist --channel listed --amo-metadata .github/amo-metadata.json --upload-source-code source.zip --approval-timeout 0 --api-key \"$JWT_USER\" --api-secret \"$JWT_SECRET\"'",
     "postversion": "pnpm exec tsx scripts/sync-manifest.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.29.3+sha512.498e1fb4cca5aa06c1dcf2611e6fafc50972ffe7189998c409e90de74566444298ffe43e6cd2acdc775ba1aa7cc5e092a8b7054c811ba8c5770f84693d33d2dc",
+  "packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8",
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.2",
     "@types/chrome": "^0.1.38",
